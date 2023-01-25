@@ -1,0 +1,39 @@
+---
+# tasks file for firewall
+  - name: Adding ssh to drop zone
+    firewalld:
+      zone: drop
+      service: "{{ item }}"
+      permanent: yes
+      state: enabled
+    with_items:
+    - ssh
+
+
+  - name: Setting drop zone as default zone
+    shell: firewall-cmd --set-default-zone=drop
+    become: true    
+
+  - name: add-icmp-block={echo-request,echo-reply} on drop zone
+    shell: firewall-cmd --zone=drop --add-icmp-block={echo-request,echo-reply} --permanent
+    become: true  
+
+  - name: Allow ICMP echo-request to source address = {{ source_address }}
+    firewalld:
+      zone: drop
+      rich_rule: rule family="ipv4" source address="{{ source_address }}" icmp-type name="echo-request" accept
+      permanent: yes
+      state: enabled    
+
+  - name: Setting drop zone as default zone
+    firewalld:
+      zone: drop
+      rich_rule: rule family="ipv4" source address="{{ source_address }}" icmp-type name="echo-reply" accept
+      permanent: yes
+      state: enabled      
+
+  - name: Reload firewalld
+    service:
+      name: firewalld
+      state: reloaded
+      enabled: yes

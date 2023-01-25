@@ -1,0 +1,28 @@
+---
+# tasks file for install-system-packages    
+  - name: Install common system packages
+    yum:
+      name: "{{ common_system_packages }}"
+      state: latest
+      use_backend: yum4
+    become: true      
+
+  - block:
+    - name: Install developer system packages
+      yum:
+        name: "{{ common_system_packages }}"
+        state: latest
+        use_backend: yum4
+
+    - name: Install the 'Development tools' package group
+      yum:
+        name: "@Development tools"
+        state: present
+
+    - name: Install the 'Development Libraries' package group
+      yum:
+        name: "@Development Libraries"
+        state: present
+        use_backend: yum4
+    become: true                
+    when: ws_developer is defined

@@ -1,0 +1,26 @@
+---
+# tasks file for docker
+
+  - name: Install docker ce system packages
+    yum:
+      name: "{{ docker_packages }}"
+      state: latest
+      use_backend: yum4
+    become: true     
+
+
+  - name: Starting docker and enabling it on boot
+    systemd:
+      name: docker
+      state: started
+      enabled: yes
+    become: true  
+
+
+  - name: adding users to docker group
+    user:
+      name: "{{ item }}"
+      groups: "docker"
+      append: true
+    with_items: "{{ docker_users }}"
+    become: true        

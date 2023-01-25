@@ -1,0 +1,19 @@
+---
+# tasks file for nix-install
+
+
+    - name: invoke sudo to create /nix if it doesnt already exist 
+      file:
+        path: /nix
+        owner: "{{ nix_user }}"
+        group: "{{ nix_group }}"
+        state: directory
+        mode: 0755
+      become: true
+
+
+    - name: Nix intallation as {{ nix_user }}
+      shell: "sh <(curl -L https://nixos.org/nix/install) --no-daemon"
+      register: show_tables_output
+      become: true
+      become_user: "{{ nix_user }}"

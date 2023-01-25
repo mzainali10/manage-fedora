@@ -1,0 +1,33 @@
+---
+- name: Setting up Fedora 37 workstation in developer mode
+  hosts: developer
+  roles: 
+#   - packages
+#   - firewall
+#   - docker
+#   - user_management
+#   - ssh  
+   - nix-install
+  gather_facts: true
+  become: yes
+  become_user: root
+  become_method: sudo 
+
+
+  pre_tasks:
+
+    - name: Run pre-tasks
+      include: includes/pre-tasks.yml 
+  
+  vars:
+    - ws_developer: true
+    - super_user: superuser
+    - simple_user: user
+    - source_address: 192.168.100.141/24
+    - local_user_email: mzainali33@gmail.com
+
+  tasks:
+
+    - name: Show reboot message to ensure that all configurations have been applied
+      debug: 
+        msg: Please reboot the target host / node before continuing, to ensure that all configurations have been applied

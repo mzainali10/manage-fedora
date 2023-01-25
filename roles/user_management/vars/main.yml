@@ -1,0 +1,5 @@
+---
+# vars file for user_management
+
+super_user: superuser
+simple_user: user

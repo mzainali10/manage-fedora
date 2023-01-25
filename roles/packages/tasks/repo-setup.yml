@@ -1,0 +1,81 @@
+---
+# tasks file for repo setup
+
+  - block:    
+    - name: fedora_release
+      command: >
+        rpm -E %fedora
+      register: fedora_release_output
+      ignore_errors: yes
+
+    - name: Install RPM Fusion repo rpms
+      dnf:
+        name: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ fedora_release_output.stdout }}.noarch.rpm"
+        state: present
+
+    - name: Install RPM Fusion Nonfree repo rpms
+      dnf:
+        name: "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_release_output.stdout }}.noarch.rpm"
+        state: present
+    become: true
+
+
+  - block:
+
+    - name: Enabling Third party repos "fedora-workstation-repositories"
+      command: dnf install fedora-workstation-repositories -y
+      args:
+        warn: false
+    become: true
+
+  - block:
+
+    - name: Install Google Chrome repo
+      dnf:
+        name: "https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm"
+        state: present
+
+    - name: Enable Google Chrome repo
+      command: dnf config-manager --set-enabled google-chrome -y
+      args:
+        warn: false
+    become: true
+
+  - block:
+    - name: Enable slack repo
+      command: dnf copr enable jdoss/slack-repo -y
+      args:
+        warn: false
+    - name: Install slack repo
+      command: dnf install slack-repo -y
+      args:
+        warn: false
+
+  - block:
+    - name: Enable Docker CE repo
+      command: yum-config-manager -y --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+      args:
+        warn: false
+
+    - name: Adding MySQL CE repo
+      dnf:
+        name: 'https://dev.mysql.com/get/mysql80-community-release-fc37-1.noarch.rpm'
+        state: present
+
+    - name: Enable vscode repo
+      yum_repository:
+        name: code
+        description: Visual Studio Code
+        file: vscode
+        baseurl: 'https://packages.microsoft.com/yumrepos/vscode'
+        gpgkey: 'https://packages.microsoft.com/keys/microsoft.asc'
+        gpgcheck: yes
+    become: true
+    when: ws_developer is defined
+
+  - name: Clean up yum repositories
+    command: yum clean all
+    args:
+      warn: no
+    ignore_errors: yes
+    become: true

@@ -1,0 +1,5 @@
+---
+# handlers file for common
+
+- name: "({{ role_name }}) hello"
+  debug:

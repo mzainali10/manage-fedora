@@ -1,0 +1,14 @@
+---
+# vars file for docker
+
+
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd
+  - docker-compose-plugin
+  - docker-compose
+
+docker_users:
+  - "{{ super_user }}"
+  - "{{ simple_user }}"

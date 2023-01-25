@@ -1,0 +1,28 @@
+---
+# vars file for install-system-packages
+
+common_system_packages:
+  - gnome-tweaks
+  - htop
+  - keepassxc  
+  - zsh
+  - fail2ban
+
+
+
+developer_system_packages:
+  - ansible
+  - code
+  - fd-find
+  - fzf
+  - ish
+  - mysql-community-server
+  - vim
+  - zsh
+  - yum-utils
+  - device-mapper-persistent-data
+  - lvm2
+
+developer_system_packages_group:  
+  - Development Tools
+  - Development Libraries  

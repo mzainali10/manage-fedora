@@ -1,0 +1,20 @@
+---
+# defaults file for pre_roles/common
+
+supported_os:
+  desktop:
+    - Fedora
+    - Ubuntu
+  server:
+    - CentOS-7
+    - CentOS-8
+    - Ubuntu-18
+    - Ubuntu-20
+
+date_cmd: "date +'%Y-%m-%d %H:%M:%S'"
+start_stats:
+  data:
+    play: "{{ ansible_play_name }}"
+    playbook_dir: "{{ playbook_dir }}"
+    status: 0
+    start: "{{ lookup('pipe', '{{ date_cmd }}') }}"

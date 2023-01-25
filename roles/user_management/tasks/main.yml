@@ -1,0 +1,39 @@
+---
+# tasks file for user_management
+
+    - name: Make sure we have a 'wheel' group
+      group:
+        name: wheel
+        state: present
+
+    - name: Add the '{{ super_user }}' user
+      user:
+        name: "{{ super_user }}" 
+        shell: /bin/bash
+        groups: wheel 
+        append: yes
+
+    - name: Enable passwordless sudo for "{{ super_user }}" user
+      lineinfile:
+        path: /etc/sudoers.d/{{ super_user }}
+        line: '{{ super_user }} ALL=(ALL) NOPASSWD: ALL'
+        state: present
+        mode: 0440
+        create: yes
+        validate: 'visudo -cf %s'
+
+    - name: Set up authorized keys for the "{{ super_user }}" user
+      authorized_key: user={{ super_user }} key="{{item}}"
+      with_file:
+        - ~/.ssh/id_rsa.pub
+
+    - name: Add the '{{ simple_user }}' user
+      user:
+        name: "{{ simple_user }}" 
+        shell: /bin/bash
+        append: yes
+
+    - name: Set up authorized keys for the "{{ simple_user }}" user
+      authorized_key: user={{ simple_user }} key="{{item}}"
+      with_file:
+        - ~/.ssh/id_rsa.pub

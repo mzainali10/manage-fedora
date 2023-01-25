@@ -1,0 +1,16 @@
+# Ensure that Ansible version on Ansible controller is >=2.9.6
+    - name: Check ansible version >=2.9.6
+      assert:
+        msg: "Ansible must be v2.9.6 or higher"
+        that:
+          - ansible_version.string is version("2.9.6", ">=")
+      run_once: true      
+      
+# Ensure that --limit is used in the ansible-playbook command, to avoid it running against unintended target hosts
+    - name: Checking that --limit is used 
+      fail:
+        msg: "you must use -l or --limit to run this playbook"
+      when: ansible_limit is not defined
+      run_once: true      
+
+        

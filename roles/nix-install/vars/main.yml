@@ -1,0 +1,5 @@
+---
+# vars file for nix-install
+
+nix_user: "{{ simple_user }}"
+nix_group: "{{ simple_user }}"
