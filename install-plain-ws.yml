@@ -1,13 +1,11 @@
 ---
-- name: Setting up Fedora 37 workstation in developer mode
-  hosts: developer
+- name: Setting up Fedora 37 workstation in plain mode
+  hosts: plain
   roles: 
    - packages
    - firewall 
    - docker   
-   - nix-install
    - ghost-install
-   - certificates
    - ssh 
   gather_facts: true
   become: yes
@@ -21,7 +19,6 @@
       include: includes/pre-tasks.yml 
   
   vars:
-    - ws_developer: true
     - super_user: superuser
     - simple_user: user
     - source_address: 192.168.100.141/24
@@ -31,11 +28,6 @@
     - dir_mariadb_etc: ~/mariadb/etc/
     - dir_mariadb_content: ~/mariadb/mysql
     - dir_mariadb_log: ~/mariadb/log
-    - ca_authority: true
-    - issue_certificate: true
-
-
-
 
   tasks:
 

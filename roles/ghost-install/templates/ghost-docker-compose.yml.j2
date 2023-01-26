@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+
+  ghost:
+    image: {{ ghost_image }}
+    restart: always
+    ports:
+      - {{ ghost_port }}:{{ ghost_port }}
+    environment:
+      # see https://ghost.org/docs/config/#configuration-options
+      database__client: mysql
+      database__connection__host: mariadb
+      database__connection__user: root
+      database__connection__password: {{ mariadb_root_password }}
+      database__connection__database: ghost
+      # this url value is just an example, and is likely wrong for your environment!
+      url: https://{{ ghost_url }}:{{ ghost_port }}
+      # contrary to the default mentioned in the linked documentation, this image defaults to NODE_ENV=production (so development mode needs to be explicitly specified if desired)
+      NODE_ENV: "{{ ghost_node_env }}"
+    
+    volumes:
+    - /etc/localtime/:/etc/localtime:ro
+    - {{ dir_ghost_content }}:/var/lib/ghost/content
+
+  mariadb:
+    image: {{ mariadb_image }}
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: {{ mariadb_root_password }}
+    ports:
+    - "3306:3306"
+
+    volumes:
+    - /etc/localtime/:/etc/localtime:ro
+    - {{ dir_mariadb_etc }}:/etc/mysql
+    - {{ dir_mariadb_content }}:/var/lib/mysql
+    - {{ dir_mariadb_log }}:/var/log/mysql

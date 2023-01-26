@@ -25,15 +25,24 @@
       permanent: yes
       state: enabled    
 
-  - name: Setting drop zone as default zone
+  - name: Allowing ICMP echo-reply to source address = {{ source_address }}
     firewalld:
       zone: drop
       rich_rule: rule family="ipv4" source address="{{ source_address }}" icmp-type name="echo-reply" accept
       permanent: yes
       state: enabled      
 
+  - name: Enabling ports
+    firewalld:
+      zone: drop    
+      port: '{{ item }}/tcp'
+      permanent: yes
+      state: enabled
+    with_items: "{{ ports_allow }}" 
+
   - name: Reload firewalld
     service:
       name: firewalld
       state: reloaded
       enabled: yes
+ 

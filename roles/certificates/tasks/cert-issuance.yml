@@ -1,0 +1,55 @@
+---
+ 
+    - name: Create certificate authority dir {{ ca_host_directory }} on CA
+      file:
+        path: "{{ item }}"
+        owner: "{{ super_user }}"
+        group: "{{ super_user }}"
+        state: directory
+        mode: 0755
+      with_items: 
+        - "{{ ca_host_directory }}"
+      become: true
+      
+    - name: Create certificate dir {{ target_host_directory }} on target host
+      file:
+        path: "{{ item }}"
+        owner: "{{ super_user }}"
+        group: "{{ super_user }}"
+        state: directory
+        mode: 0755
+      with_items: 
+        - "{{ target_host_directory }}"
+      become: true
+
+    - name: Create private key for new certificate on target host {{ target_host_directory }}
+      community.crypto.openssl_privatekey:
+        path: '{{ target_host_directory }}/certificate.key'
+      run_once: true
+
+    - name: Create certificate signing request (CSR) for new certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: '{{ target_host_directory }}/certificate.key'
+        subject_alt_name:
+          - "DNS:{{ domain }}"
+      run_once: true
+      register: csr
+
+    - name: Sign certificate with our CA
+      community.crypto.x509_certificate_pipe:
+        csr_content: "{{ csr.csr }}"
+        provider: ownca
+        ownca_path: '{{ ca_host_directory }}/ca-certificate.pem'
+        ownca_privatekey_path: '{{ ca_host_directory }}/ca-certificate.key'
+        ownca_not_after: +365d  # valid for one year
+        ownca_not_before: "-1d"  # valid since yesterday
+      run_once: true
+      register: certificate
+
+    - name: Write target certificate file
+      copy:
+        dest: "{{ target_host_directory }}/{{ target_cert_name }}"
+        content: "{{ certificate.certificate }}"
+
+    - name: Copying new certificates to trusted certificates {{ trusted_cert_location }}
+      shell: sudo cp {{ target_host_directory }}/{{ target_cert_name }} {{ trusted_cert_location }}

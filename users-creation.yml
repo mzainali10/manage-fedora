@@ -1,0 +1,25 @@
+---
+- name: Setting up users Fedora 37 workstation
+  hosts: developer
+  roles: 
+   - user_management
+  gather_facts: true
+  become: yes
+  become_user: root
+  become_method: sudo 
+
+
+  pre_tasks:
+
+    - name: Run pre-tasks
+      include: includes/pre-tasks.yml 
+  
+  vars:
+    - super_user: superuser
+    - simple_user: user
+
+  tasks:
+
+    - name: Users created
+      debug: 
+        msg: To continue with the remaining installation. Please run the "install-developer-ws.yml" or "install-plain-ws.yml" using "{{ super_user }}"

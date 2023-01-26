@@ -58,9 +58,7 @@
         warn: false
 
     - name: Adding MySQL CE repo
-      dnf:
-        name: 'https://dev.mysql.com/get/mysql80-community-release-fc37-1.noarch.rpm'
-        state: present
+      shell: dnf install -y https://dev.mysql.com/get/mysql80-community-release-fc37-1.noarch.rpm
 
     - name: Enable vscode repo
       yum_repository:

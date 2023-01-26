@@ -1,0 +1,15 @@
+---
+# tasks file for certificates
+
+  - block: 
+    - name: Role  "certificates" | Running task "ca-setup.yml"
+      import_tasks: ca-setup.yml
+      when: ca_authority is defined
+
+    - name: Role "certificates" | Running task "cert-issuance.yml"
+      import_tasks: cert-issuance.yml
+      when: issue_certificate is defined
+
+    become: yes
+    become_user: superuser
+    become_method: sudo

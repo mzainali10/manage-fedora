@@ -1,0 +1,7 @@
+# vars file for certificates
+
+    ca_host_directory: ~/cert_authority
+    target_host_directory: ~/cert_issuance
+    domain: '*sysops.admin'
+    target_cert_name: 'sysops.admin-certificate.pem'   
+    trusted_cert_location: /etc/pki/ca-trust/source/anchors/

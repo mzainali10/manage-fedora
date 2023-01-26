@@ -1,0 +1,30 @@
+---
+# tasks file for ghost-install
+
+    - name: Installing Ghost. Creating directory structure for ghost and mariadb.
+      file:
+        path: "{{ item }}"
+        owner: "{{ simple_user }}"
+        group: "{{ simple_user }}"
+        state: directory
+        mode: 0755
+      with_items: "{{ ghost_installation_dir }}"
+      become_user: root
+      become: true
+
+    - name: Copying templates/ghost-docker-compose.yml.j2 to target host {{ dir_ghost_docker_compose }}/docker-compose.yml
+      template:
+        src: "templates/ghost-docker-compose.yml.j2"
+        dest: "{{ dir_ghost_docker_compose }}/docker-compose.yml"
+        owner: "{{ simple_user }}"
+        group: "{{ simple_user }}"
+        mode: 0644
+      become_user: "{{ simple_user }}"
+      become: true
+
+    - name: Starting ghost and mariadb
+      docker_compose:
+        project_src: "{{ dir_ghost_docker_compose }}"
+        state: present
+      become_user: "{{ simple_user }}"
+      become: true         

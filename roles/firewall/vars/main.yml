@@ -1,2 +1,8 @@
 ---
 # vars file for firewall
+
+ports_allow:
+  - "{{ ghost_port }}"
+  - 443
+  - 80
+  - 3306
