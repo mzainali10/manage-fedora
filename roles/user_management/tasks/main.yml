@@ -6,7 +6,7 @@
         name: wheel
         state: present
 
-    - name: Add the '{{ super_user }}' user
+    - name: Creating '{{ super_user }}' user
       user:
         name: "{{ super_user }}" 
         shell: /bin/bash
@@ -27,7 +27,7 @@
       with_file:
         - ~/.ssh/id_rsa.pub
 
-    - name: Add the '{{ simple_user }}' user
+    - name: Creating '{{ simple_user }}' user
       user:
         name: "{{ simple_user }}" 
         shell: /bin/bash

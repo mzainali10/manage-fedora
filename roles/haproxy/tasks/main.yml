@@ -1,0 +1,67 @@
+---
+# tasks file for haproxy
+
+    - include_vars: ../../certificates/vars/main.yml
+    - include_vars: ../../ghost-install/vars/main.yml
+
+    - name: Installing HA Proxy
+      yum:
+        name: haproxy
+        state: latest
+        use_backend: yum4
+      tags:
+        - install-haproxy
+
+    - name: Stopping HAProxy, if previously running
+      systemd:
+        name: haproxy
+        state: stopped 
+      tags:
+        - haproxy
+
+    - name: Expose previous deployment with HAproxy 
+      block:
+        - name: Combine CA certificate and private key
+          shell: cat {{ ca_host_directory }}/ca-certificate.pem  {{ ca_host_directory }}/ca-certificate.key > ~/ca.pem
+
+        - name: Combine SSL certificate and private key
+          shell: cat {{ target_host_directory }}/{{ target_cert_name}} {{ target_host_directory }}/certificate.key > ~/ssl_{{ target_cert_name }};
+
+        - name: Create SSL certificates directory for HAProxy
+          shell: sudo mkdir -p /etc/ssl/certs;
+
+        - name: Save SSL and CA certificate on loadbalancer at /etc/ssl/certs
+          shell: sudo mv  ~/{ca.pem,ssl_{{ target_cert_name }}}  /etc/ssl/certs/
+
+        - name: Using restorecon for restoring the default context at /etc/ssl/certs
+          shell: sudo restorecon -v -R /etc/ssl/certs/
+      become: true
+      become_user: "{{ super_user }}"      
+
+    - name: Template HAProxy config file to remote host
+      block:
+        - template:
+            src: ../templates/haproxy.cfg.j2
+            dest: /etc/haproxy/haproxy.cfg
+            force: yes
+            backup: yes
+      tags:
+        - haproxy 
+        - template_haproxy
+
+    - name: Set HAProxy SELinux Booleans
+      block:
+        - seboolean:
+            name: haproxy_connect_any
+            state: yes
+            persistent: yes
+
+    - name: Start HAProxy 
+      systemd:
+        name: haproxy 
+        state: started
+        enabled: yes
+      tags:
+        - haproxy 
+      
+        

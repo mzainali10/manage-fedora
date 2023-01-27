@@ -1,15 +1,15 @@
 ---
 
+### This playbook creates certificate authority and generates a self signed CA.
+
     - name: Create certificate authority dir {{ ca_host_directory }}
       file:
-        path: "{{ item }}"
+        path: "{{ ca_host_directory }}"
         owner: "{{ super_user }}"
         group: "{{ super_user }}"
         state: directory
         mode: 0755
-      with_items: 
-        - ca_host_directory: ~/cert_authority
-      become: true
+
       
     - name: Create private key with password protection
       community.crypto.openssl_privatekey:
@@ -35,7 +35,7 @@
         privatekey_path: '{{ ca_host_directory }}/ca-certificate.key'
         provider: selfsigned
 
-
+# Adding CA self signed certificate to trusted certificates
     - name: Adding CA self signed certificate to trusted certificates {{ trusted_cert_location }}
-      shell: sudo cp {{ ca_host_directory }}/ca-certificate.pem {{ trusted_cert_location }}
+      shell: sudo cp {{ ca_host_directory }}/ca-certificate.pem {{ trusted_cert_location }}; sudo update-ca-trust
 

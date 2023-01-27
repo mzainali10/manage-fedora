@@ -1,6 +1,8 @@
 ---
 # vars file for firewall
 
+
+## ports to allow in firewalld. Add desired ports here
 ports_allow:
   - "{{ ghost_port }}"
   - 443

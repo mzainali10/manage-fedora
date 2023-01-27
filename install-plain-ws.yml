@@ -2,11 +2,12 @@
 - name: Setting up Fedora 37 workstation in plain mode
   hosts: plain
   roles: 
+   - ssh
    - packages
    - firewall 
    - docker   
    - ghost-install
-   - ssh 
+ 
   gather_facts: true
   become: yes
   become_user: root
@@ -18,16 +19,6 @@
     - name: Run pre-tasks
       include: includes/pre-tasks.yml 
   
-  vars:
-    - super_user: superuser
-    - simple_user: user
-    - source_address: 192.168.100.141/24
-    - local_user_email: mzainali33@gmail.com
-    - dir_ghost_docker_compose: ~/ghost/docker-compose
-    - dir_ghost_content: ~/ghost/content/
-    - dir_mariadb_etc: ~/mariadb/etc/
-    - dir_mariadb_content: ~/mariadb/mysql
-    - dir_mariadb_log: ~/mariadb/log
 
   tasks:
 

@@ -1,5 +1,7 @@
 ---
 # tasks file for docker
+  ## include from user_management for docker
+  - include_vars: ../../user_management/vars/main.yml
 
   - name: Install docker ce system packages
     yum:

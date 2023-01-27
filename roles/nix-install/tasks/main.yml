@@ -2,7 +2,7 @@
 # tasks file for nix-install
 
 
-    - name: invoke sudo to create /nix if it doesnt already exist 
+    - name: Invoke sudo to create /nix if it doesnt already exist 
       file:
         path: /nix
         owner: "{{ nix_user }}"
