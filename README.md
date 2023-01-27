@@ -14,7 +14,7 @@ This repo is all about setting up Fedora workstation with customized requirement
 
 ## Installation
 
-Clone the repository to your desired location and ensure that the following directory structure given at the bottom matches the structure of your current directory. 
+Clone the repository to your desired location. 
 
 ## Usage
 
@@ -22,125 +22,87 @@ Once inside the ansible directory `manage-fedora`. There are three essential pla
 1. users-creation.yml
 	- Creates two users i.e. simple user and super user. 
 	- Passwordless sudo for superuser.
-	- Copies controller's ssh-key to both user's `authorized_keys`
+	- Copies ansible controller's ssh-key to both user's `authorized_keys`
 2. install-developer-ws.yml
 	 -  Contains following roles:
+		   - ssh
 		   - packages
 		   - firewall 
-		   - docker   
+		   - docker  
 		   - nix-install
 		   - ghost-install
 		   - certificates
-		   - ssh 
+		   - haproxy
 1. install-plain-ws.yml
 	 -  Contains following roles:
+		   - ssh
 		   - packages
 		   - firewall 
 		   - docker   
-		   - ghost-install
-		   - ssh 
+		   - ghost-install 
 
-Edit the `hosts.ini` that is present at `./inventory/hosts.ini` and construct your cluster based as follows
-1. Place all developer hosts under the developer group with their corresponding IP Addresses.
-2. Place all plain hosts (non developers) under the plain group.
+Edit the `hosts.ini` that is present at `./inventory/hosts.ini` and construct your cluster based on:
+1. Place all `developer` hosts under the `developer` group with their corresponding IP Addresses.
+2. Place all `plain` hosts (non developers) under the `plain` group.
+3. Make sure a group of groups `workstation` is present and add both groups `developer` and `plain` as its children.
 
 #Note `./inventory/hosts.ini` is defined as default host file under `ansible.cfg`
 
-3. Prepare these essentials variables
+4. Prepare these essentials variables
 
 ### Variables
 
 ###### 1. Vars inside the playbook
-The playbooks `install-developer-ws.yml` and `install-plain-ws.yml` require following essential vars:
+
+The playbooks `install-developer-ws.yml` require following essential vars:
 ```
-- ws_developer: true               ##Only for install-developer-ws.yml
-- super_user: superuser            ##Superuser username
-- simple_user: user                ##plain user username
-- source_address: 192.168.0.0/24   ##Source IP Address to allow ICMP in firewalld
-- local_user_email: mzainali33@gmail.com        ##Email for fail2ban
-
-- dir_ghost_docker_compose: ~/ghost/docker-compose  ##path for docker-compose.yml
-
-- dir_ghost_content: ~/ghost/content/     ## path for ghost/content 
-- dir_mariadb_etc: ~/mariadb/etc/         ## mariadB docker volume point
-- dir_mariadb_content: ~/mariadb/mysql   ## mariadB contents /var/lib/mysql
-- dir_mariadb_log: ~/mariadb/log         ## mariadB docker vol. for log
-
+- ws_developer: true          ## Only for install-developer-ws.yml
 - ca_authority: true          ## Only define when CA needs to be created
-
 - issue_certificate: true     ## Only define when certificate needs to be issued
 ```
 
-#Note For `install-developer-ws.yml`, the variable `ws_developer` variable must be defined and for `install-plain-ws.yml` it must not (shold be commeted out). Based on this variable, additional packages are ignored for plain users.
-#Note The vaiables `ca_authority` must be commented out if certificate authority creation is not desired. Simialry comment out `issue_certificate` if a certificate is not to be issued.
+- Notes:
+	- For `install-developer-ws.yml`, the variable `ws_developer` variable must be defined and for `install-plain-ws.yml` it must not (should be commeted out). Based on this variable, additional packages are installed for `devopler` users.
+	- The vaiables `ca_authority` must be commented out if certificate authority creation is not desired. Simialry comment out `issue_certificate` if a certificate is not to be issued. Or comment out the role `certificate` which will skip both.
 
-###### 2. Vars for `certificate` role:
-```
-ca_host_directory: ~/cert_authority             ## path to ca directory
-target_host_directory: ~/cert_issuance          ## path to target host directory
-domain: '*sysops.admin'                         ## using wildcard domain
-target_cert_name: 'sysops.admin-certificate.pem'       ## target cert name
-trusted_cert_location: /etc/pki/ca-trust/source/anchors/ #Trusted certs location
-```
+###### 2. Vars for hosts and groups:
 
-###### 3.  Vars `docker` role:
+- Note: 
+	  Under the group of groups `workstation`, following two variables are added. They will be inherited to `devoloper` and `plain` groups and subsequently to all hosts defined under both groups.
 
 ```
-docker_packages:
-
-- docker-ce
-- docker-ce-cli
-- containerd
-- docker-compose-plugin
-- docker-compose
-
-docker_users:
-- "{{ super_user }}"                       ## defined inside the playbook
-- "{{ simple_user }}"                      ## defined inside the playbook
+- super_user: superuser            ##Superuser username
+- simple_user: user                ##plain user username
 ```
 
-###### 4. Vars for `firewall` role:
+- If you want to have any variables specific to any hosts, then create a host file under `./inventory/host_vars` add your host specific variables, they will take precedence. Make sure to include your host under `developer` or `plain` groups.
 
+- Location:
 ```
-source_address: 192.168.0.0/24         ## Define Source IP address to allow ICMP
-ports_allow:                           ## ports to allow. Add desired ports
-- 443
-- 80
-- 3306
-- 2368
-```
-
-###### 5. Vars for `ghost-install` role:
-
-Assign the image, port, url, mariadB password etc here.
-
-```
-ghost_image: ghost:4-alpine                 ##Chose the image for ghost
-
-ghost_port: 2368                            ##Chose the port for ghost
-ghost_url: localhost                        ##Chose the url for ghost
-ghost_node_env: development                 ##Chose the node_env for ghost
-
-mariadb_image: mariadb:latest               ##Chose the image for mariadb
-mariadb_root_password: 80*lG3uY0T           ##Chose the password for mariadb
-
-ghost_installation_dir:               ##These dirs were defined in main playbook
-- "{{ dir_ghost_docker_compose }}"
-- "{{ dir_ghost_content }}"
-- "{{ dir_mariadb_etc }}"
-- "{{ dir_mariadb_content }}"
-- "{{ dir_mariadb_log }}"
+./inventory/
+├── group_vars
+│   ├── developer
+│   ├── plain
+│   └── workstation
+├── hosts.ini
+└── host_vars
+    └── ws01
 ```
 
-###### 6. Vars for `nix-install` role
 
-Nix will be installed as plain user.
+###### 3. Vars for `ssh` role:
+
 ```
-nix_user: "{{ simple_user }}"
-nix_group: "{{ simple_user }}"
+local_user_email: mzainali33@gmail.com        ##Email for fail2ban
 ```
 
-###### 7.  Vars for `install-system-packages`
+- Location:
+```
+./roles/ssh/vars/
+└── main.yml
+```
+
+###### 4. Vars for `packages` role:
 
 Developer packages are installed when `ws_developer` is defined. Comment it out for plain users. 
 
@@ -171,6 +133,124 @@ developer_system_packages_group:
 - Development Libraries
 ```
 
+- Location:
+```
+./roles/packages/vars/
+└── main.yml
+```
+
+
+###### 5. Vars for `firewall` role:
+
+```
+source_address: 192.168.0.0/24         ## Define Source IP address to allow ICMP
+ports_allow:                           ## ports to allow. Add desired ports
+- 443
+- 80
+- 3306
+- 2368
+```
+
+- Location:
+```
+./roles/firewall/vars/
+└── main.yml
+```
+
+###### 6.  Vars `docker` role:
+
+```
+
+include_vars: ../../user_management/vars/main.yml  ## Include vars in user-mgt
+
+docker_packages:
+
+- docker-ce
+- docker-ce-cli
+- containerd
+- docker-compose-plugin
+- docker-compose
+
+docker_users:
+- "{{ super_user }}"                       ## defined inside the playbook
+- "{{ simple_user }}"                      ## defined inside the playbook
+```
+
+- Location:
+```
+./roles/docker/vars/
+└── main.yml
+```
+
+###### 7. Vars for `nix-install` role
+
+Nix will be installed as plain user.
+```
+nix_user: "{{ simple_user }}"
+nix_group: "{{ simple_user }}"
+```
+
+- Location:
+```
+./roles/nix-install/vars/
+└── main.yml
+```
+
+###### 8. Vars for `ghost-install` role:
+
+Assign the `image`, `port`, `url`, `mariadB` password etc here.
+
+```
+ghost_image: ghost:4-alpine                 ##Chose the image for ghost
+
+ghost_port: 2368                            ##Chose the port for ghost
+ghost_url: localhost                        ##Chose the url for ghost
+ghost_node_env: development                 ##Chose the node_env for ghost
+
+mariadb_image: mariadb:latest               ##Chose the image for mariadb
+mariadb_root_password: 80*lG3uY0T           ##Chose the password for mariadb
+
+dir_ghost_docker_compose: ~/ghost/docker-compose  ##path for docker-compose.yml
+
+dir_ghost_content: ~/ghost/content/     ## path for ghost/content 
+dir_mariadb_etc: ~/mariadb/etc/         ## mariadB docker volume point
+dir_mariadb_content: ~/mariadb/mysql   ## mariadB contents /var/lib/mysql
+dir_mariadb_log: ~/mariadb/log         ## mariadB docker vol. for log
+
+ghost_installation_dir:               ##These dirs were defined in main playbook
+- "{{ dir_ghost_docker_compose }}"
+- "{{ dir_ghost_content }}"
+- "{{ dir_mariadb_etc }}"
+- "{{ dir_mariadb_content }}"
+- "{{ dir_mariadb_log }}"
+```
+
+- Location:
+```
+./roles/ghost-install/vars/
+└── main.yml
+```
+
+###### 9.  Vars for `certificates`
+
+```
+ca_host_directory: ~/cert_authority             ## path to ca directory
+target_host_directory: ~/cert_issuance          ## path to target host directory
+domain:
+- "DNS:www.sysops.jobs"
+- "DNS:sysops.jobs"
+- "DNS:*.sysops.jobs"                        ## using wildcard domain
+target_cert_name: 'sysops.jobs-certificate.pem'       ## target cert name
+trusted_cert_location: /etc/pki/ca-trust/source/anchors/ #Trusted certs location
+```
+
+ As stated above under section `1. Vars inside the playbook`, in `certificates` role, the vaiables `ca_authority` must be commented out only if certificate authority creation is not desired. Simialry comment out `issue_certificate` if a certificate is not to be issued. Or comment out the role `certificate` which will skip both. As default they are enabled for in `install-developer-ws.yml` playbook. 
+
+ Location:
+```
+./roles/certificates/vars/
+└── main.yml
+```
 
 ## Examples
 
@@ -187,7 +267,7 @@ plain
 
   
 [developer]
-ws01 ansible_host=192.168.100.173
+ws01 ansible_host=192.168.100.174
 
 [plain]
 ws02 ansible_host=192.168.100.202
@@ -201,9 +281,11 @@ ansible-playbook -u superuser install-developer-ws.yml --limit=ws01 --diff
 ansible-playbook -u superuser install-plain-ws.yml --limit=ws01 --diff
 ```
 
-#Note The playbook `users-creation.yml` must run as root user. The remaning playbooks must run as `superuser`
-#Note Run with `--check` flag to be sure about what the playbook is doing.
-#Note The variables in the main playbooks can be moved to `workstation`. They were not moved to have more visibility. 
+- Notes:
+	- The playbook `users-creation.yml` must run as root user. The remaning playbooks must run as `superuser` (or the user defined in `super_user` var)
+	- Run with `--check` flag to be sure about what the playbook is doing.
+	- The variables in the main playbooks can be moved to `workstation`. They were not moved to have more visibility. 
+	- Run the playbook against single host using `--limit=<host>` or against group `--limit=<group>` . For example `--limit=ws01` and `--limit=developer`
 
 ## Explanation
 
@@ -215,15 +297,18 @@ Following pre-tasks are included in all three playbooks and these are executed a
 - Checking that --limit is used
 
 ### Roles
+
 Following are all the roles:
 1. user_management
-2. packages
-3. firewall 
-4. docker   
-5. nix-install
-6. ghost-install
-7. certificates
-8. ssh 
+2. ssh
+3. packages   
+4. firewall       
+5. docker
+6. nix-install
+7. ghost-install
+8. certificates
+9. haproxy
+10. deployment-ghost-block
 
 #### Tasks per Role
 
@@ -287,7 +372,7 @@ Following are all the roles:
 
 #Template `ghost-docker-compose.yml.j2`
 
-##### certificate
+##### certificates
 1.  Create certificate authority dir `{{ ca_host_directory }}`
 2.  Create private key with password protection
 3.  Create certificate signing request CSR for CA certificate
@@ -309,13 +394,22 @@ Following are all the roles:
 
 #Template `jail.local.j2` and `sshd_config.j2`
 
+##### deployment-ghost-block
+
+The `deployment-ghost-block` runs following roles as its dependencies. It does not have any explicit tasks. 
+```
+dependencies:
+- role: docker
+- role: ghost-install
+- role: certificates
+- role: haproxy
+```
+
+When `deployment-ghost-block` role is set, please skip the roles `docker`, `ghost-install` , `certificates` and `haproxy`. Otherwise it will duplicate the case.
+
 ## Todo
 
-1. Expose previous deployment with any reverse proxy (bonus task)
-	- Use sysops.admin and www.sysops.admin domain
-	- Expose with SSL certificates created in previous task
-
-2. Create ansible role for provisioning created docker deployment
+1. Troubleshoot reverse proxy integration with ghost deployment.
 
 
 ## Frequently asked questions
