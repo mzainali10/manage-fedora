@@ -11,11 +11,11 @@ mariadb_image: mariadb:latest
 mariadb_root_password: 80*lG3uY0T
 
 #ghost & mariadB docker volume mount points
-dir_ghost_docker_compose: ~/ghost/docker-compose
-dir_ghost_content: ~/ghost/content/
-dir_mariadb_etc: ~/mariadb/etc/
-dir_mariadb_content: ~/mariadb/mysql
-dir_mariadb_log: ~/mariadb/log
+dir_ghost_docker_compose: ~/ghost/docker-compose   ##path for docker-compose.yml
+dir_ghost_content: ~/ghost/content/     ## path for ghost/content 
+dir_mariadb_etc: ~/mariadb/etc/          ## mariadB docker volume point
+dir_mariadb_content: ~/mariadb/mysql       ## mariadB contents /var/lib/mysql
+dir_mariadb_log: ~/mariadb/log              ## mariadB docker vol. for log
 
 ## For item loop
 ghost_installation_dir:

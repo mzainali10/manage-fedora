@@ -6,5 +6,5 @@
       - "DNS:www.sysops.jobs"
       - "DNS:sysops.jobs"
       - "DNS:*.sysops.jobs"
-    target_cert_name: 'sysops.admin-certificate.pem'   
+    target_cert_name: 'sysops.jobs-certificate.pem'   
     trusted_cert_location: /etc/pki/ca-trust/source/anchors/
