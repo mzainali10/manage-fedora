@@ -149,6 +149,7 @@ ports_allow:                           ## ports to allow. Add desired ports
 - 80
 - 3306
 - 2368
+- 8080
 ```
 
 - Location:
@@ -203,19 +204,27 @@ Assign the `image`, `port`, `url`, `mariadB` password etc here.
 ```
 ghost_image: ghost:4-alpine                 ##Chose the image for ghost
 
-ghost_port: 2368                            ##Chose the port for ghost
-ghost_url: localhost                        ##Chose the url for ghost
+ghost_port: 8080                   ##Chose the port for ghost (outside docker)
+ghost_url: https://sysops.jobs             ##Chose the url for ghost
 ghost_node_env: development                 ##Chose the node_env for ghost
 
 mariadb_image: mariadb:latest               ##Chose the image for mariadb
 mariadb_root_password: 80*lG3uY0T           ##Chose the password for mariadb
 
-dir_ghost_docker_compose: ~/ghost/docker-compose  ##path for docker-compose.yml
+##path for docker-compose.yml
+dir_ghost_docker_compose: /home/{{ simple_user }}/ghost/docker-compose 
 
-dir_ghost_content: ~/ghost/content/     ## path for ghost/content 
-dir_mariadb_etc: ~/mariadb/etc/         ## mariadB docker volume point
-dir_mariadb_content: ~/mariadb/mysql   ## mariadB contents /var/lib/mysql
-dir_mariadb_log: ~/mariadb/log         ## mariadB docker vol. for log
+## path for ghost/content
+dir_ghost_content: /home/{{ simple_user }}/ghost/content/ 
+
+## mariadB docker volume point
+dir_mariadb_etc: /home/{{ simple_user }}/mariadb/etc/ 
+
+## mariadB contents /var/lib/mysql
+dir_mariadb_content: /home/{{ simple_user }}/mariadb/mysql 
+
+## mariadB docker vol. for log
+dir_mariadb_log: /home/{{ simple_user }}/mariadb/log 
 
 ghost_installation_dir:               ##These dirs were defined in main playbook
 - "{{ dir_ghost_docker_compose }}"
@@ -234,8 +243,12 @@ ghost_installation_dir:               ##These dirs were defined in main playbook
 ###### 9.  Vars for `certificates`
 
 ```
-ca_host_directory: ~/cert_authority             ## path to ca directory
-target_host_directory: ~/cert_issuance          ## path to target host directory
+## path to ca directory
+ca_host_directory: /home/{{ super_user }}/cert_authority
+
+## path to target host directory for issued(target) certificate
+target_host_directory: /home/{{ super_user }}/cert_issuance
+
 domain:
 - "DNS:www.sysops.jobs"
 - "DNS:sysops.jobs"
@@ -407,10 +420,12 @@ dependencies:
 
 When `deployment-ghost-block` role is set, please skip the roles `docker`, `ghost-install` , `certificates` and `haproxy`. Otherwise it will duplicate the case.
 
-## Todo
+This role can used independently and it will setup ghost from scratch running in a docker environment.
+- Ghost in a dockerized environment, with HAproxy
+![ghost-web](docs/ghost-web.png)
+- SSL Certificates are installed
 
-1. Troubleshoot reverse proxy integration with ghost deployment.
-
+![SSL certificates are enabled](docs/ssl.png)
 
 ## Frequently asked questions
 
@@ -440,4 +455,3 @@ Copyright &copy; 2023, Muhammad Zain Ali
 [shield-license]: https://img.shields.io/github/license/GITHUB-ACCOUNT/manage-fedora
 [shield-release]: https://img.shields.io/github/v/release/GITHUB-ACCOUNT/manage-fedora
 [shield-prs]: https://img.shields.io/badge/PRs-welcome-brightgreen
-

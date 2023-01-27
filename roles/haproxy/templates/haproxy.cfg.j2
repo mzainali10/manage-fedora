@@ -30,6 +30,6 @@ frontend ghost-blog-https
 
 backend ghost-blog-be
 # uncomment the next line to force always ssl
-#   redirect scheme https if !{ ssl_fc }
-    server {{ ansible_hostname }} 127.0.0.1:{{ ghost_port }} check ssl ca-file /etc/ssl/certs/ca.pem
+    #redirect scheme https if !{ ssl_fc }
+    server {{ ansible_hostname }} 127.0.0.1:{{ ghost_port }} check verify none
 

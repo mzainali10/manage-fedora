@@ -1,6 +1,16 @@
 ---
 # tasks file for ghost-install
 
+
+    - name: Stopping ghost and mariadB containers, which could be running due to previous run
+      docker_compose:
+        project_src: "{{ dir_ghost_docker_compose }}"
+        state: absent
+      ignore_errors: true
+      become_user: "{{ simple_user }}"
+      become: true  
+
+
     - name: Installing Ghost. Creating directory structure for ghost and mariadb.
       file:
         path: "{{ item }}"
@@ -19,7 +29,7 @@
         owner: "{{ simple_user }}"
         group: "{{ simple_user }}"
         mode: 0644
-      become_user: "{{ simple_user }}"
+      become_user: root
       become: true
 
     - name: Starting ghost and mariadb
