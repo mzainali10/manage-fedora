@@ -8,6 +8,7 @@
       name: "{{ docker_packages }}"
       state: latest
       use_backend: yum4
+    become_user: root  
     become: true     
 
 
@@ -16,6 +17,7 @@
       name: docker
       state: started
       enabled: yes
+    become_user: root  
     become: true  
 
 
@@ -25,4 +27,5 @@
       groups: "docker"
       append: true
     with_items: "{{ docker_users }}"
+    become_user: root  
     become: true        

@@ -1,7 +1,7 @@
 # vars file for certificates
 
-    ca_host_directory: ~/cert_authority
-    target_host_directory: ~/cert_issuance
+    ca_host_directory: /home/{{ super_user }}/cert_authority
+    target_host_directory: /home/{{ super_user }}/cert_issuance
     domain: 
       - "DNS:www.sysops.jobs"
       - "DNS:sysops.jobs"

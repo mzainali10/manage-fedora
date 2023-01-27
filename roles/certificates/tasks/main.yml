@@ -12,4 +12,3 @@
 
     become: yes
     become_user: "{{ super_user }}"
-    become_method: sudo

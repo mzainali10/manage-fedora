@@ -1,4 +1,4 @@
 ## Todo
 
-1. Troubleshoot reverse proxy integration with ghost deployment.
+1. Make different plays more idempotent.
 

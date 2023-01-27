@@ -2,15 +2,15 @@
 - name: Setting up Fedora 37 workstation in developer mode
   hosts: developer
   roles:
-   #- ssh
-   #- packages   
-   #- firewall       
-   #- docker
-   #- nix-install
-   #- ghost-install
-   #- certificates
-   #- haproxy
-   - deployment-ghost-block
+   - ssh
+   - packages   
+   - firewall       
+   - docker
+   - nix-install
+   - ghost-install
+   - certificates
+   - haproxy
+   #- deployment-ghost-block
   gather_facts: true
   become: yes
   become_user: root
