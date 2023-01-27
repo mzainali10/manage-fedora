@@ -10,7 +10,7 @@
    - ghost-install
    - certificates
    - haproxy
-   - deployment-ghost-block
+#   - deployment-ghost-block
   gather_facts: true
   become: yes
   become_user: root
