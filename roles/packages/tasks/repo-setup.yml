@@ -1,6 +1,7 @@
 ---
 # tasks file for repo setup
 
+
   - block:    
     - name: fedora_release
       command: >
@@ -53,7 +54,7 @@
 
   - block:
     - name: Enable Docker CE repo
-      command: yum-config-manager -y --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+      shell: yum install -y yum-utils; yum-config-manager -y --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
       args:
         warn: false
 

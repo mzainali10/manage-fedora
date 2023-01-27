@@ -11,6 +11,7 @@ This repo is all about setting up Fedora workstation with customized requirement
 - **Dependencies:**
   - Ansible >= 2.9.6
   - `community.crypto` package must be installed.
+  - `sshpass` 
 
 ## Installation
 
@@ -25,8 +26,8 @@ Once inside the ansible directory `manage-fedora`. There are three essential pla
 	- Copies ansible controller's ssh-key to both user's `authorized_keys`
 2. install-developer-ws.yml
 	 -  Contains following roles:
-		   - ssh
 		   - packages
+		   - ssh		   
 		   - firewall 
 		   - docker  
 		   - nix-install
@@ -35,8 +36,8 @@ Once inside the ansible directory `manage-fedora`. There are three essential pla
 		   - haproxy
 1. install-plain-ws.yml
 	 -  Contains following roles:
-		   - ssh
 		   - packages
+		   - ssh		   
 		   - firewall 
 		   - docker   
 		   - ghost-install 
@@ -90,19 +91,7 @@ The playbooks `install-developer-ws.yml` require following essential vars:
 ```
 
 
-###### 3. Vars for `ssh` role:
-
-```
-local_user_email: mzainali33@gmail.com        ##Email for fail2ban
-```
-
-- Location:
-```
-./roles/ssh/vars/
-└── main.yml
-```
-
-###### 4. Vars for `packages` role:
+###### 3. Vars for `packages` role:
 
 Developer packages are installed when `ws_developer` is defined. Comment it out for plain users. 
 
@@ -139,6 +128,17 @@ developer_system_packages_group:
 └── main.yml
 ```
 
+###### 4. Vars for `ssh` role:
+
+```
+local_user_email: mzainali33@gmail.com        ##Email for fail2ban
+```
+
+- Location:
+```
+./roles/ssh/vars/
+└── main.yml
+```
 
 ###### 5. Vars for `firewall` role:
 
@@ -289,13 +289,13 @@ ws02 ansible_host=192.168.100.202
 Use the following commands to run the three playbooks. 
 
 ```
-ansible-playbook -u root users-creation.yml --limit=ws01 --diff
+ansible-playbook -u <root or default user> users-creation.yml --limit=ws01 --diff --ask-pass --ask-become-pass
 ansible-playbook -u superuser install-developer-ws.yml --limit=ws01 --diff
 ansible-playbook -u superuser install-plain-ws.yml --limit=ws01 --diff
 ```
 
 - Notes:
-	- The playbook `users-creation.yml` must run as root user. The remaning playbooks must run as `superuser` (or the user defined in `super_user` var)
+	- The playbook `users-creation.yml` must run as root or the default user with sudo access. The remaning playbooks must run as `superuser` (or the user defined in `super_user` var)
 	- Run with `--check` flag to be sure about what the playbook is doing.
 	- The variables in the main playbooks can be moved to `workstation`. They were not moved to have more visibility. 
 	- Run the playbook against single host using `--limit=<host>` or against group `--limit=<group>` . For example `--limit=ws01` and `--limit=developer`
@@ -313,8 +313,8 @@ Following pre-tasks are included in all three playbooks and these are executed a
 
 Following are all the roles:
 1. user_management
-2. ssh
-3. packages   
+2. packages
+3. ssh   
 4. firewall       
 5. docker
 6. nix-install
@@ -358,6 +358,11 @@ Following are all the roles:
 16. Install the 'Development Libraries' package group
 	- For developer group.
 
+##### ssh
+1.  Copying `templates/sshd_config.j2` template to `/etc/ssh/sshd_config`
+2.  Copy `templates/jail.local.j2` to `/etc/fail2ban/jail.local`
+3.  Start and enable `sshd`
+4.  Start and enable `fail2ban`
 
 ##### firewall
 1.  Adding ssh to drop zone
@@ -398,12 +403,6 @@ Following are all the roles:
 10.  Sign certificate with our CA
 11.  Write target certificate file
 12.  Copying new certificates to trusted certificates `{{ trusted_cert_location }}`
-
-##### ssh
-1.  Copying `templates/sshd_config.j2` template to `/etc/ssh/sshd_config`
-2.  Copy `templates/jail.local.j2` to `/etc/fail2ban/jail.local`
-3.  Start and enable `sshd`
-4.  Start and enable `fail2ban`
 
 #Template `jail.local.j2` and `sshd_config.j2`
 
