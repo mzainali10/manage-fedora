@@ -32,7 +32,7 @@
       permanent: yes
       state: enabled      
 
-  - name: Enabling ports
+  - name: Enabling ports in firewall
     firewalld:
       zone: drop    
       port: '{{ item }}/tcp'

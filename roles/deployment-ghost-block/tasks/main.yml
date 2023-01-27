@@ -1,0 +1,6 @@
+---
+# tasks file for deployment-ghost-block
+
+    - name: All dependencies of deployment role of ghost-blog is completed.
+      debug: 
+        msg: Finished deployment of ghot-blog

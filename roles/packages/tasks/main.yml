@@ -1,5 +1,11 @@
 ---
-    - import_tasks: upgrade-packages.yml
-    - import_tasks: repo-setup.yml
-    - import_tasks: install-system-packages.yml
+## Main task file that will import tasks from "upgrade-packages.yml", "repo-setup.yml" and "cert-issuance.yml"
+  - block: 
+    - name: Role  "packages" | Running task "upgrade-packages.yml"
+      import_tasks: upgrade-packages.yml
 
+    - name: Role "packages" | Running task "repo-setup.yml"
+      import_tasks: repo-setup.yml
+
+    - name: Role "packages" | Running task "install-system-packages.yml"
+      import_tasks: install-system-packages.yml

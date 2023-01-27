@@ -9,7 +9,7 @@ common_system_packages:
   - fail2ban
 
 
-
+#Developer packages are installed when ws_developer is defined. Comment it out for plain users.
 developer_system_packages:
   - ansible
   - code

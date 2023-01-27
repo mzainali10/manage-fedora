@@ -30,8 +30,7 @@
     - name: Create certificate signing request (CSR) for new certificate
       community.crypto.openssl_csr_pipe:
         privatekey_path: '{{ target_host_directory }}/certificate.key'
-        subject_alt_name:
-          - "DNS:{{ domain }}"
+        subject_alt_name: "{{ domain }}"                   
       run_once: true
       register: csr
 
@@ -51,5 +50,7 @@
         dest: "{{ target_host_directory }}/{{ target_cert_name }}"
         content: "{{ certificate.certificate }}"
 
-    - name: Copying new certificates to trusted certificates {{ trusted_cert_location }}
-      shell: sudo cp {{ target_host_directory }}/{{ target_cert_name }} {{ trusted_cert_location }}
+#Adding new certificate as trusted certificates
+    - name: Copying new certificates to trusted certificates {{ trusted_cert_location }}. Update update-ca-trust
+      shell: sudo cp {{ target_host_directory }}/{{ target_cert_name }} {{ trusted_cert_location }}; sudo update-ca-trust
+

@@ -4,6 +4,7 @@ services:
 
   ghost:
     image: {{ ghost_image }}
+    container_name: ghost
     restart: always
     ports:
       - {{ ghost_port }}:{{ ghost_port }}
@@ -25,11 +26,12 @@ services:
 
   mariadb:
     image: {{ mariadb_image }}
+    container_name: mariadb
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: {{ mariadb_root_password }}
     ports:
-    - "3306:3306"
+    - "3307:3306"
 
     volumes:
     - /etc/localtime/:/etc/localtime:ro

@@ -1,2 +1,3 @@
 
-ws_developer: true
+### Define vars here that are only specific to one host i.e. ws01
+

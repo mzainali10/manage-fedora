@@ -11,5 +11,5 @@
       when: issue_certificate is defined
 
     become: yes
-    become_user: superuser
+    become_user: "{{ super_user }}"
     become_method: sudo

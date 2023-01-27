@@ -1,14 +1,16 @@
 ---
 - name: Setting up Fedora 37 workstation in developer mode
   hosts: developer
-  roles: 
-   - packages
-   - firewall 
-   - docker   
+  roles:
+   - ssh
+   - packages   
+   - firewall       
+   - docker
    - nix-install
    - ghost-install
    - certificates
-   - ssh 
+   - haproxy
+   - deployment-ghost-block
   gather_facts: true
   become: yes
   become_user: root
@@ -21,21 +23,10 @@
       include: includes/pre-tasks.yml 
   
   vars:
-    - ws_developer: true
-    - super_user: superuser
-    - simple_user: user
-    - source_address: 192.168.100.141/24
-    - local_user_email: mzainali33@gmail.com
-    - dir_ghost_docker_compose: ~/ghost/docker-compose
-    - dir_ghost_content: ~/ghost/content/
-    - dir_mariadb_etc: ~/mariadb/etc/
-    - dir_mariadb_content: ~/mariadb/mysql
-    - dir_mariadb_log: ~/mariadb/log
-    - ca_authority: true
-    - issue_certificate: true
-
-
-
+    - ws_developer: true         #Only for install-developer-ws.yml . Keep it here.
+##Vars for certificates. They can be moved to their respective hosts. Comment them out to skip the step.
+    - ca_authority: true         # Only define when CA needs to be created
+    - issue_certificate: true    # Only define when certificate needs to be issued
 
   tasks:
 
