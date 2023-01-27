@@ -2,8 +2,8 @@
 - name: Setting up Fedora 37 workstation in plain mode
   hosts: plain
   roles: 
-   - ssh
    - packages
+   - ssh   
    - firewall 
    - docker   
    - ghost-install

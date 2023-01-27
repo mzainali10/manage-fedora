@@ -2,8 +2,8 @@
 - name: Setting up Fedora 37 workstation in developer mode
   hosts: developer
   roles:
-   - ssh
    - packages   
+   - ssh   
    - firewall       
    - docker
    - nix-install

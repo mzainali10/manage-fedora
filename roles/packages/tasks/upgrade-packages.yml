@@ -1,5 +1,5 @@
 ---
-    - name: Upgrade all packages
+    - name: Upgrade all packages. Please wait...
       yum:
         name: '*'
         state: latest
